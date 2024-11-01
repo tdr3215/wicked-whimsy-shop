@@ -17,6 +17,8 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "../ui/textarea";
 import ImageUpload from "../custom_ui/ImageUpload";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   title: z.string().min(2).max(20),
@@ -34,12 +36,32 @@ const CollectionForm = () => {
       image: "",
     },
   });
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/collections", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+
+      if (res.ok) {
+        setLoading(false);
+        toast.success("Collection created successfully!");
+        router.push("/collections");
+      }
+    } catch (error) {
+      console.log("[CollectionForm]", error);
+      toast.error("Something went wrong! Please try again.");
+    }
     console.log(values);
   };
 
-  return (
+  return loading ? (
+    // Change to something prettier
+    <span>Loading</span>
+  ) : (
     <div className="p-10">
       <p className="text-heading2-bold">Create Collection</p>
       <Separator className="mt-4 mb-7 bg-green-1" />

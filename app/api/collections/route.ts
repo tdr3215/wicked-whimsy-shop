@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { connectToDb } from "@/lib/db/mongoDb";
 import { Collection } from "@/lib/models/Collection";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
+// POST 
 export const POST = async (req: NextRequest) => {
     try {
         // CHECK USERID
@@ -34,6 +36,17 @@ export const POST = async (req: NextRequest) => {
         return NextResponse.json(newCollection, { status: 201 })
     } catch (error) {
         console.log("[collections_POST]", error)
+        return new NextResponse("Internal Server Error", { status: 500 })
+    }
+}
+
+export const GET = async (req: NextRequest) => {
+    try {
+        await connectToDb()
+        const collections = await Collection.find().sort({ createdAt: "desc" })
+        return NextResponse.json(collections, { status: 200 })
+    } catch (error) {
+        console.log("[collections_GET]", error)
         return new NextResponse("Internal Server Error", { status: 500 })
     }
 }
