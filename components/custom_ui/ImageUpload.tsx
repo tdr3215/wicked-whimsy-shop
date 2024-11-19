@@ -45,7 +45,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       <CldUploadWidget uploadPreset="iz0ftvur" onSuccess={onSuccess}>
         {({ open }) => {
           return (
-            <Button className={"bg-green-2 text-white"} onClick={() => open()}>
+            <Button
+              className={"bg-pink-400 text-white rounded-xl"}
+              onClick={() => open()}
+            >
               <Plus className="h-4 w-4 mr-2" /> Upload an Image
             </Button>
           );

@@ -8,12 +8,12 @@ const CollectionDetailsPage = () => {
   const [loading, setLoading] = useState(false);
   const [collectionDetails, setCollectionDetails] =
     useState<CollectionType | null>(null);
-  const params = useParams();
+  const { collectionId } = useParams();
 
   useEffect(() => {
     const getCollectionDetails = async () => {
       try {
-        const res = await fetch(`/api/collections/${params.collectionId}`, {
+        const res = await fetch(`/api/collections/${collectionId}`, {
           method: "GET",
         });
         const data = await res.json();
@@ -24,7 +24,7 @@ const CollectionDetailsPage = () => {
       }
     };
     getCollectionDetails();
-  }, [params.collectionId]);
+  }, [collectionId]);
   return loading ? (
     <Loader />
   ) : (

@@ -5,10 +5,11 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET
-export const GET = async (req: NextRequest, { params }: { params: { collectionId: string } }) => {
+export const GET = async (req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) => {
     try {
         await connectToDb()
-        const collection = await Collection.findById(params.collectionId)
+        const { collectionId } = await params
+        const collection = await Collection.findById(collectionId)
         console.log(collection)
 
         if (!collection) {
@@ -25,7 +26,7 @@ export const GET = async (req: NextRequest, { params }: { params: { collectionId
 }
 
 // POST 
-export const POST = async (req: NextRequest, { params }: { params: { collectionId: string } }) => {
+export const POST = async (req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) => {
     try {
         const userId = auth()
 
@@ -33,7 +34,8 @@ export const POST = async (req: NextRequest, { params }: { params: { collectionI
             return new NextResponse("Unauthorized", { status: 401 })
         }
         await connectToDb()
-        let collection = await Collection.findById(params.collectionId)
+        const { collectionId } = await params
+        let collection = await Collection.findById(collectionId)
         if (!collection) {
             return new NextResponse("Collection not found!", { status: 404 })
         }
@@ -43,7 +45,7 @@ export const POST = async (req: NextRequest, { params }: { params: { collectionI
             return new NextResponse("Must include title and image", { status: 400 })
         }
 
-        collection = await Collection.findByIdAndUpdate(params.collectionId, { title, description, image }, { new: true })
+        collection = await Collection.findByIdAndUpdate(collectionId, { title, description, image }, { new: true })
         return NextResponse.json(collection, { status: 200 })
     } catch (error) {
         console.log("[collectionId_POST]", error)
@@ -51,7 +53,7 @@ export const POST = async (req: NextRequest, { params }: { params: { collectionI
     }
 }
 // DELETE
-export const DELETE = async (req: NextRequest, { params }: { params: { collectionId: string } }) => {
+export const DELETE = async (req: NextRequest, { params }: { params: Promise<{ collectionId: string }> }) => {
 
 
     try {
@@ -61,7 +63,9 @@ export const DELETE = async (req: NextRequest, { params }: { params: { collectio
             return new NextResponse("Unauthorized", { status: 401 })
         }
         await connectToDb()
-        await Collection.findByIdAndDelete(params.collectionId)
+        const { collectionId } = await params
+
+        await Collection.findByIdAndDelete(collectionId)
         return new NextResponse("Collection is deleted!", { status: 200 })
 
     } catch (error) {

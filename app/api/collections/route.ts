@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
     try {
         // CHECK USERID
-        const { userId } = auth()
+        const userId = auth()
         if (!userId) {
             return new NextResponse("Unauthorized", { status: 401 })
         }
@@ -32,7 +32,6 @@ export const POST = async (req: NextRequest) => {
             image,
         })
 
-        await newCollection.save()
         return NextResponse.json(newCollection, { status: 201 })
     } catch (error) {
         console.log("[collections_POST]", error)

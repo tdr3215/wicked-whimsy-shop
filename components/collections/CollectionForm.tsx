@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "../ui/textarea";
 import ImageUpload from "../custom_ui/ImageUpload";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import Delete from "../custom_ui/Delete";
 
@@ -44,6 +44,17 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
         },
   });
   const [loading, setLoading] = useState(false);
+
+  // Handles accidental pressing of enter key before form completion
+  const handleKeyPress = (
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -93,7 +104,11 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter a title" {...field} />
+                  <Input
+                    placeholder="Enter a title"
+                    {...field}
+                    onKeyDown={handleKeyPress}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -113,6 +128,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
                     placeholder="Enter a description"
                     {...field}
                     rows={5}
+                    onKeyDown={handleKeyPress}
                   />
                 </FormControl>
 
@@ -144,11 +160,14 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-purple-1 text-white">
+            <Button
+              type="submit"
+              className="bg-purple-1 text-white hover:bg-purple-800 rounded-xl"
+            >
               Submit
             </Button>
             <Button
-              className="bg-purple-1 text-white"
+              className="bg-red-700 text-white hover:bg-red-600 rounded-xl"
               type="button"
               onClick={() => {
                 router.push("/collections");
