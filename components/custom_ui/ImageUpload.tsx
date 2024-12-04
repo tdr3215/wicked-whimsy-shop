@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { CldUploadWidget } from "next-cloudinary";
+import { CldUploadWidget, CldImage } from "next-cloudinary";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import Image from "next/image";
+import MultiImageUpload from "./MultiImageUpload";
+// import handleMultiFileUpload from "@/lib/upload/handleMultiFileUpload";
 
 interface ImageUploadProps {
   value: string[];
@@ -16,14 +17,37 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   onRemove,
 }) => {
   const onSuccess = (result: any) => {
-    onChange(result.info.secure_url);
+    console.log(result);
+    if (typeof result.info === "object" && "secure_url" in result.info) {
+      onChange(result.info.secure_url);
+    }
+
+    // if (result.event === "upload-added" && result.info) {
+    //   onChange(result.info.secure_url);
+    // }
   };
+  /*
+! Fix Multiple Images not loading onUpload
+https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
+  */
+  // const onSuccess = async (result: any) => {
+  //   try {
+  //     console.log(result);
+  //     const resources = await handleMultiFileUpload();
+  //     value = resources;
+  //     return "done";
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  // const images = handleMultiFileUpload();
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-4">
-        {value.map((url, i) => (
-          <div key={i} className="relative w-[200px] h-[200px]">
+        {value.map((url) => (
+          <div key={url} className="relative w-[200px] h-[200px]">
             <div className="absolute top-0 right-0 z-10">
               <Button
                 onClick={() => onRemove(url)}
@@ -42,11 +66,35 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           </div>
         ))}
       </div>
-      <CldUploadWidget uploadPreset="iz0ftvur" onSuccess={onSuccess}>
+      {/* !EXPERIMENTAL 
+
+      <MultiImageUpload
+        className={
+          "bg-green-400 text-white rounded-xl hover:bg-pink-300 h-8 w-20"
+        }
+        signatureEndpoint="/api/sign-cloudinary-params"
+        uploadPreset="iz0ftvur"
+        onUploadAdded={onSuccess}
+        options={{
+          multiple: true,
+          maxFiles: 20,
+          tags: ["images"],
+        }}
+      /> */}
+
+      <CldUploadWidget
+        uploadPreset="iz0ftvur"
+        signatureEndpoint="/api/sign-cloudinary-params"
+        onSuccess={onSuccess}
+        options={{
+          multiple: true,
+          maxFiles: 20,
+        }}
+      >
         {({ open }) => {
           return (
             <Button
-              className={"bg-pink-400 text-white rounded-xl"}
+              className={"bg-pink-400 text-white rounded-xl hover:bg-pink-300"}
               onClick={() => open()}
             >
               <Plus className="h-4 w-4 mr-2" /> Upload an Image
