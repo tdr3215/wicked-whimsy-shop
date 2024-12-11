@@ -22,7 +22,6 @@ import toast from "react-hot-toast";
 import Delete from "../custom_ui/Delete";
 import MultiText from "../custom_ui/MultiText";
 import MultiSelect from "../custom_ui/MultiSelect";
-import handleMultiFileUpload from "@/lib/upload/handleMultiFileUpload";
 
 const formSchema = z.object({
   title: z.string().min(2).max(20),
@@ -45,7 +44,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState<CollectionType[]>([]);
-  // const [uploadedImages, setUploadedImages] = useState([""]);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const getCollections = async () => {
     try {
       const res = await fetch("/api/collections", { method: "GET" });
@@ -189,15 +188,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                 <FormControl>
                   {/* Fix it so there are multiple images shown at once */}
                   <ImageUpload
+                    uploadedImages={uploadedImages}
                     value={field.value}
-                    onChange={(url) => field.onChange([...field.value, url])}
-                    onRemove={(url) =>
+                    onChange={(data) => {
+                      setUploadedImages((uploadedImages) => {
+                        return [...uploadedImages, data];
+                      });
+                      field.onChange([...field.value, data]);
+                    }}
+                    onRemove={(url) => {
                       field.onChange([
                         ...field.value.filter((image) => image !== url),
-                      ])
-                    }
+                      ]);
+
+                      setUploadedImages(
+                        uploadedImages.filter((image) => image !== url)
+                      );
+                    }}
                   />
-                  {/* {uploadedImages.map((img,index) => (
+
+                  {/* {uploadedImages.map((img, index) => (
                     <Image
                       src={img}
                       key={index}

@@ -1,13 +1,13 @@
-// "use server"
+"use server"
+import { CldImageProps } from "next-cloudinary";
 import getCloudinary from "./getCloudinary";
 
 
-const handleMultiFileUpload = async () => {
+const handleMultiFileUpload = async (value: any) => {
     const cloudinary = await getCloudinary()
-
-
-    const { resources } = await cloudinary.search.expression(`'resource_type:image AND AND uploaded_at<1m`)
-        .execute();
+    const resources = await cloudinary.uploader.upload(value).then(result => {
+        return result
+    })
 
     return resources
 };

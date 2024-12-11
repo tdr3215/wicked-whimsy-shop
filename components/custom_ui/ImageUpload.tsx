@@ -3,29 +3,27 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";
 import Image from "next/image";
 import MultiImageUpload from "./MultiImageUpload";
-// import handleMultiFileUpload from "@/lib/upload/handleMultiFileUpload";
+import handleMultiFileUpload from "@/lib/upload/handleMultiFileUpload";
 
 interface ImageUploadProps {
   value: string[];
   onChange: (url: string) => void;
   onRemove: (url: string) => void;
+  uploadedImages: string[];
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
-  value,
   onChange,
   onRemove,
+  uploadedImages,
 }) => {
   const onSuccess = (result: any) => {
-    console.log(result);
     if (typeof result.info === "object" && "secure_url" in result.info) {
+      handleMultiFileUpload(result.info.secure_url);
       onChange(result.info.secure_url);
     }
-
-    // if (result.event === "upload-added" && result.info) {
-    //   onChange(result.info.secure_url);
-    // }
   };
+
   /*
 ! Fix Multiple Images not loading onUpload
 https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
@@ -46,7 +44,7 @@ https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-4">
-        {value.map((url) => (
+        {uploadedImages.map((url) => (
           <div key={url} className="relative w-[200px] h-[200px]">
             <div className="absolute top-0 right-0 z-10">
               <Button
@@ -66,7 +64,6 @@ https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
           </div>
         ))}
       </div>
-      {/* !EXPERIMENTAL 
 
       <MultiImageUpload
         className={
@@ -74,15 +71,15 @@ https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
         }
         signatureEndpoint="/api/sign-cloudinary-params"
         uploadPreset="iz0ftvur"
-        onUploadAdded={onSuccess}
+        onSuccess={onSuccess}
         options={{
           multiple: true,
           maxFiles: 20,
-          tags: ["images"],
+          tags: [`images`],
         }}
-      /> */}
+      />
 
-      <CldUploadWidget
+      {/* <CldUploadWidget
         uploadPreset="iz0ftvur"
         signatureEndpoint="/api/sign-cloudinary-params"
         onSuccess={onSuccess}
@@ -101,7 +98,7 @@ https://cloudinary.com/blog/next-js-cloudinary-upload-transform-moderate-images
             </Button>
           );
         }}
-      </CldUploadWidget>
+      </CldUploadWidget> */}
     </div>
   );
 };
